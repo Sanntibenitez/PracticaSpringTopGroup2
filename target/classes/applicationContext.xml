@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans   
+    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd
+">
+
+	<!-- Inyeccion de dependencias por archivo -->
+	<context:property-placeholder
+		location="classpath:productos.properties" />
+
+	<!-- Creacion de la dependencia SignatureFormatter -->
+	<bean id="signatureFormatter"
+		class="com.tg.practice.spring.dao.impl.SignatureFormatter">
+	<!-- Inyeccion de la dependencia por constructor y archivo -->
+		<constructor-arg type="java.lang.String"
+			value="${signature}"></constructor-arg>
+	</bean>
+
+	<!-- Creacion de la dependencia MessageSource -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="mensaje" />
+		<property name="defaultEncoding" value="UTF-8" />
+	</bean>
+
+	<!-- Creacion de la dependencia LenguageFormatter -->
+	<bean id="languageFormatter"
+		class="com.tg.practice.spring.dao.impl.LanguageFormatter">
+
+		<!-- Inyeccion de la dependencia messageSource -->
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+
+	<!-- Creacion de la dependencia ControlStockServiceBean -->
+	<bean id="controlStockServiceBean"
+		class="com.tg.practice.spring.dao.impl.ControlStockServiceBean">
+
+		<!-- Inyeccion de dependencias por archivo -->
+		<property name="cantidadMaximaImpresion"
+			value="${maximaImpresion}"></property>
+
+		<!-- Inyeccion de dependencias lenguageFormatter y signatureFormatter -->
+		<property name="cadenaDeFormatters">
+			<list>
+				<ref bean="languageFormatter" />
+				<ref bean="signatureFormatter" />
+			</list>
+		</property>
+		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="daoPedido" ref="pedidoDaoBean" />
+		<property name="stockMailSender" ref="stockMailSender" />
+	</bean>
+
+</beans>
